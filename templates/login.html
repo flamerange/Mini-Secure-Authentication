@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Login - AuthNode{% endblock %}
+
+{% block content %}
+<div class="w-full max-w-md glass p-10 rounded-[2rem] shadow-2xl relative overflow-hidden border border-white/10">
+    <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-violet-500 to-indigo-500"></div>
+    
+    <div class="mb-10 text-center">
+        <h2 class="text-3xl font-bold text-white mb-2">Gate Activation</h2>
+        <p class="text-slate-400 text-sm">Synchronize your credentials to access the node</p>
+    </div>
+    
+    <div id="alert-box" class="hidden mb-8 p-4 rounded-xl text-sm border font-medium animate-in fade-in slide-in-from-top-4 duration-300"></div>
+
+    <form id="login-form" class="space-y-6">
+        <div class="space-y-1.5">
+            <label for="email" class="block text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">Terminal Email</label>
+            <input type="email" id="email" name="username" required placeholder="name@domain.com"
+                class="input-field w-full rounded-xl px-5 py-3.5 text-white outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
+        </div>
+        
+        <div class="space-y-1.5">
+            <div class="flex justify-between items-center ml-1">
+                <label for="password" class="block text-xs font-bold uppercase tracking-widest text-slate-400">Access Key</label>
+            </div>
+            <input type="password" id="password" name="password" required placeholder="••••••••"
+                class="input-field w-full rounded-xl px-5 py-3.5 text-white outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
+        </div>
+        
+        <button type="submit" id="submit-btn" class="w-full mt-4 btn-primary text-white font-bold py-4 rounded-xl shadow-indigo-500/20 active:scale-95 transition-all">
+            Secure Entry
+        </button>
+    </form>
+    
+    <div class="mt-10 text-center border-t border-white/5 pt-8">
+        <p class="text-slate-400 text-sm">
+            New operator? <a href="/register" class="text-indigo-400 hover:text-indigo-300 font-bold transition-colors">Request access profile</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const form = e.target;
+        const submitBtn = document.getElementById('submit-btn');
+        const alertBox = document.getElementById('alert-box');
+        
+        submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        submitBtn.innerHTML = '<span class="flex items-center justify-center gap-2"><svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Authenticating...</span>';
+        
+        const formData = new URLSearchParams(new FormData(form));
+        
+        try {
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData
+            });
+            
+            const data = await response.json();
+            
+            alertBox.classList.remove('hidden');
+            if (response.ok) {
+                localStorage.setItem('access_token', data.access_token);
+                alertBox.className = "mb-8 p-4 rounded-xl text-sm border font-medium bg-emerald-500/10 border-emerald-500/20 text-emerald-400 block animate-in fade-in slide-in-from-top-4";
+
+                alertBox.innerHTML = "Identity Verified. Synchronization complete. Entering Dashboard...";
+                setTimeout(() => {
+                    window.location.href = '/dashboard';
+                }, 1000);
+            } else {
+                alertBox.className = "mb-8 p-4 rounded-xl text-sm border font-medium bg-rose-500/10 border-rose-500/20 text-rose-400 block animate-in fade-in slide-in-from-top-4";
+                alertBox.innerHTML = "Access Denied: " + (data.detail || "Invalid credential packet.");
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                submitBtn.innerHTML = 'Secure Entry';
+            }
+        } catch (error) {
+            alertBox.classList.remove('hidden');
+            alertBox.className = "mb-8 p-4 rounded-xl text-sm border font-medium bg-rose-500/10 border-rose-500/20 text-rose-400 block";
+            alertBox.innerHTML = "Connection Failure: Target node is unreachable.";
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            submitBtn.innerHTML = 'Secure Entry';
+        }
+    });
+</script>
+{% endblock %}

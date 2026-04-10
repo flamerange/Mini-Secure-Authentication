@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Register - AuthNode{% endblock %}
+
+{% block content %}
+<div class="w-full max-w-md glass p-10 rounded-[2rem] shadow-2xl relative overflow-hidden border border-white/10">
+    <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-indigo-500 to-violet-500"></div>
+    
+    <div class="mb-10 text-center">
+        <h2 class="text-3xl font-bold text-white mb-2">Create Account</h2>
+        <p class="text-slate-400 text-sm">Join the network and secure your environment</p>
+    </div>
+    
+    <div id="alert-box" class="hidden mb-8 p-4 rounded-xl text-sm border font-medium animate-in fade-in slide-in-from-top-4 duration-300"></div>
+
+    <form id="register-form" class="space-y-6">
+        <div class="space-y-1.5">
+            <label for="username" class="block text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">Username</label>
+            <input type="text" id="username" name="username" required placeholder="johndoe"
+                class="input-field w-full rounded-xl px-5 py-3.5 text-white outline-none focus:ring-2 focus:ring-indigo-500/50">
+        </div>
+        
+        <div class="space-y-1.5">
+            <label for="email" class="block text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">Email Address</label>
+            <input type="email" id="email" name="email" required placeholder="john@example.com"
+                class="input-field w-full rounded-xl px-5 py-3.5 text-white outline-none focus:ring-2 focus:ring-indigo-500/50">
+        </div>
+        
+        <div class="space-y-1.5">
+            <label for="password" class="block text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">Password</label>
+            <input type="password" id="password" name="password" required placeholder="••••••••"
+                class="input-field w-full rounded-xl px-5 py-3.5 text-white outline-none focus:ring-2 focus:ring-indigo-500/50">
+        </div>
+        
+        <div class="space-y-1.5">
+            <label for="role" class="block text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">Role Allocation</label>
+            <div class="relative">
+                <select id="role" name="role" class="input-field w-full rounded-xl px-5 py-3.5 text-white outline-none focus:ring-2 focus:ring-indigo-500/50 appearance-none cursor-pointer">
+                    <option value="user" class="bg-slate-900">Standard User</option>
+                    <option value="admin" class="bg-slate-900">System Administrator</option>
+                </select>
+                <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-50">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
+            </div>
+        </div>
+        
+        <button type="submit" id="submit-btn" class="w-full mt-4 btn-primary text-white font-bold py-4 rounded-xl shadow-indigo-500/20 active:scale-95 transition-all">
+            Initialize Account
+        </button>
+    </form>
+    
+    <div class="mt-10 text-center">
+        <p class="text-slate-400 text-sm">
+            Already assigned credentials? <a href="/login" class="text-indigo-400 hover:text-indigo-300 font-bold transition-colors">Sign in here</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    document.getElementById('register-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const form = e.target;
+        const submitBtn = document.getElementById('submit-btn');
+        const alertBox = document.getElementById('alert-box');
+        
+        submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        submitBtn.innerHTML = '<span class="flex items-center justify-center gap-2"><svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Provisioning...</span>';
+        
+        const formData = new FormData(form);
+        
+        try {
+            const response = await fetch('/register', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const data = await response.json();
+            
+            alertBox.classList.remove('hidden');
+            if (response.ok) {
+                alertBox.className = "mb-8 p-4 rounded-xl text-sm border font-medium bg-emerald-500/10 border-emerald-500/20 text-emerald-400 block animate-in fade-in slide-in-from-top-4";
+                alertBox.innerHTML = "Success! Security profile created. Authenticating redirection...";
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 1500);
+            } else {
+                alertBox.className = "mb-8 p-4 rounded-xl text-sm border font-medium bg-rose-500/10 border-rose-500/20 text-rose-400 block animate-in fade-in slide-in-from-top-4";
+                alertBox.innerHTML = "Deployment Error: " + (data.detail || "Invalid parameters provided.");
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                submitBtn.innerHTML = 'Initialize Account';
+            }
+        } catch (error) {
+            alertBox.classList.remove('hidden');
+            alertBox.className = "mb-8 p-4 rounded-xl text-sm border font-medium bg-rose-500/10 border-rose-500/20 text-rose-400 block";
+            alertBox.innerHTML = "Critical Error: Core server connectivity lost.";
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            submitBtn.innerHTML = 'Initialize Account';
+        }
+    });
+</script>
+{% endblock %}
