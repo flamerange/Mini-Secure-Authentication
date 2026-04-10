@@ -35,17 +35,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-import os
-app.add_middleware(
-    TrustedHostMiddleware,
-    allowed_hosts=[
-        "localhost",
-        "127.0.0.1",
-        "*.onrender.com",           # This allows all Render subdomains
-        "mini-secure-authentication.onrender.com",  # Your specific domain
-        os.getenv("RENDER_EXTERNAL_HOSTNAME", ""),  # Dynamic Render hostname
-    ]
-)
+# TrustedHostMiddleware removed for Render demo compatibility
 
 templates = Jinja2Templates(directory="templates")
 
