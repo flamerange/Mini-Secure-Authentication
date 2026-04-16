@@ -17,6 +17,7 @@
             </div>
             
             <h3 class="text-2xl font-bold text-white mb-2" id="user-name">Terminal User</h3>
+            <p class="text-sm font-bold text-slate-400 mb-4" id="user-id">User ID: sync...</p>
             <span id="user-role" class="px-4 py-1.5 rounded-full text-xs font-black tracking-widest uppercase bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Authorized User</span>
             
             <div class="w-full mt-10 space-y-4">
@@ -131,6 +132,7 @@
             if (res.ok) {
                 const data = await res.json();
                 document.getElementById('user-name').innerText = data.username;
+                document.getElementById('user-id').innerText = "User ID: " + data.user_id;
                 document.getElementById('user-email').innerText = data.email;
                 
                 const roleBadge = document.getElementById('user-role');
@@ -147,6 +149,8 @@
                         adminCard.classList.add('animate-in', 'fade-in', 'slide-in-from-right-4', 'duration-500');
                     }
                 }
+                
+                renderOutput(data, 'indigo');
 
 
             } else if (res.status === 401) {
