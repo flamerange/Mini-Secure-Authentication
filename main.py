@@ -185,6 +185,40 @@ async def get_all_users_list(
 async def admin_users_page(request: Request):
     return templates.TemplateResponse("admin_users.html", {"request": request})
 
+@app.get("/admin/create-user", response_class=HTMLResponse)
+async def admin_create_user_page(request: Request):
+    return templates.TemplateResponse("admin_create_user.html", {"request": request})
+
+@app.post("/admin/create-user")
+async def admin_create_user(
+    request: Request,
+    username: str = Form(...),
+    email: str = Form(...),
+    password: str = Form(...),
+    role: str = Form("user"),
+    token: str = Depends(dependencies.oauth2_scheme),
+    db: Session = Depends(database.get_db)
+):
+    # Verify the caller is an admin
+    admin_user = dependencies.get_current_user(token, db)
+    if admin_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Admin privileges required")
+    
+    if role not in ["user", "admin"]:
+        role = "user"
+    
+    hashed_password = security.get_password_hash(password)
+    db_user = models.User(username=username, email=email, hashed_password=hashed_password, role=role)
+    
+    try:
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+        return {"success": True, "message": f"User '{username}' created successfully with password set by admin", "user_id": db_user.id}
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Username or Email already registered")
+
 if __name__ == "__main__":
 
     import uvicorn

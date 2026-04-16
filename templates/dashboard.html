@@ -90,6 +90,16 @@
                     <p class="text-xs text-slate-400 mb-6 leading-relaxed">Full registry access. Audit and monitor all connected node operators across the network.</p>
                     <button class="px-5 py-2.5 bg-emerald-500/10 text-emerald-400 text-xs font-black uppercase tracking-widest rounded-xl border border-emerald-500/20 group-hover:bg-emerald-500 group-hover:text-white transition-all">Access Registry</button>
                 </div>
+
+                <!-- Action 4: Create New User (Admin Only) -->
+                <div id="admin-create-user-card" class="hidden bg-white/[0.03] p-6 rounded-3xl border border-white/5 hover:border-amber-500/30 transition-all group cursor-pointer" onclick="window.location.href='/admin/create-user'">
+                    <div class="w-12 h-12 bg-amber-500/10 rounded-2xl flex items-center justify-center text-amber-400 mb-6 group-hover:scale-110 transition-transform">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
+                    </div>
+                    <h4 class="font-bold text-white text-lg mb-2">Create New User</h4>
+                    <p class="text-xs text-slate-400 mb-6 leading-relaxed">Provision a new operator with admin-set password and assign role privileges.</p>
+                    <button class="px-5 py-2.5 bg-amber-500/10 text-amber-400 text-xs font-black uppercase tracking-widest rounded-xl border border-amber-500/20 group-hover:bg-amber-500 group-hover:text-white transition-all">Create User</button>
+                </div>
             </div>
 
 
@@ -147,6 +157,12 @@
                     if(adminCard) {
                         adminCard.classList.remove('hidden');
                         adminCard.classList.add('animate-in', 'fade-in', 'slide-in-from-right-4', 'duration-500');
+                    }
+                    // Reveal admin create user card
+                    const createUserCard = document.getElementById('admin-create-user-card');
+                    if(createUserCard) {
+                        createUserCard.classList.remove('hidden');
+                        createUserCard.classList.add('animate-in', 'fade-in', 'slide-in-from-right-4', 'duration-500');
                     }
                 }
                 
