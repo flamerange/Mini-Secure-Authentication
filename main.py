@@ -103,14 +103,21 @@ async def register(
 @limiter.limit("5/minute")
 async def login(
     request: Request,
+    email: str = Form(None),
+    password: str = Form(None),
     username: str = Form(None),
-    email: str = Form(...),
-    password: str = Form(...),
     db: Session = Depends(database.get_db)
 ):
+    # Support both HTML form (email field) and Swagger (username field)
+    login_email = email or username
+    if not login_email or not password:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Email and password are required",
+        )
 
     # Authenticate by email
-    user = db.query(models.User).filter(models.User.email == email).first()
+    user = db.query(models.User).filter(models.User.email == login_email).first()
     if not user or not auth.verify_password(password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -150,8 +157,6 @@ async def logout(token: str = Depends(dependencies.oauth2_scheme)):
     return {"message": "Successfully logged out"}
 
 @app.get("/protected-data")
-
-
 async def get_protected_data(current_user: models.User = Depends(dependencies.get_current_user)):
     return {
         "message": "This is protected data. You have access!",
