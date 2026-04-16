@@ -23,7 +23,7 @@ A robust, enterprise-grade authentication and authorization system built with Fa
 ## 🚀 All Implemented Features
 
 - **Secure Registration** — Form-based user/admin provisioning.
-- **JWT Authentication** — Secure login generating Access and Refresh Tokens.
+- **JWT Authentication** — Secure login generating Access and Refresh Tokens. JWT token is now generated on login and stored in browser localStorage.
 - **Token Refresh System** — Obtain new access tokens without re-logging in.
 - **Logout with Blacklisting** — Invalidates the JWT server-side securely.
 - **Role-Based Access Control (RBAC)** — Strict separation between Standard Users and System Administrators.
@@ -67,7 +67,7 @@ Navigate to:
 This project is prepared for easy deployment on Render.
 Please see the `DEPLOYMENT.md` file for exact step-by-step guidance.
 
-**Live Render URL:** *(Add the live url once deployed)*
+**Live Render URL:** [https://mini-secure-authentication.onrender.com](https://mini-secure-authentication.onrender.com)
 
 ---
 *Final Submission Draft — 2026*
