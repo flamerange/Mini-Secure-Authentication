@@ -4,7 +4,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-import models, database, auth, dependencies
+import models, database, security, dependencies
 import jwt
 from typing import Optional
 from dotenv import load_dotenv
@@ -87,7 +87,7 @@ async def register(
     if role not in ["user", "admin"]:
         role = "user"
     
-    hashed_password = auth.get_password_hash(password)
+    hashed_password = security.get_password_hash(password)
     db_user = models.User(username=username, email=email, hashed_password=hashed_password, role=role)
     
     try:
@@ -118,15 +118,15 @@ async def login(
 
     # Authenticate by email
     user = db.query(models.User).filter(models.User.email == login_email).first()
-    if not user or not auth.verify_password(password, user.hashed_password):
+    if not user or not security.verify_password(password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    access_token = auth.create_access_token(data={"sub": user.email})
-    refresh_token = auth.create_refresh_token(data={"sub": user.email})
+    access_token = security.create_access_token(data={"sub": user.email})
+    refresh_token = security.create_refresh_token(data={"sub": user.email})
     return {
         "access_token": access_token,
         "refresh_token": refresh_token,
@@ -137,7 +137,7 @@ async def login(
 @app.post("/refresh")
 async def refresh_token(refresh_token: str = Form(...), db: Session = Depends(database.get_db)):
     try:
-        payload = jwt.decode(refresh_token, auth.SECRET_KEY, algorithms=[auth.ALGORITHM])
+        payload = jwt.decode(refresh_token, security.SECRET_KEY, algorithms=[security.ALGORITHM])
         email: str = payload.get("sub")
         if email is None:
             raise HTTPException(status_code=401, detail="Invalid refresh token")
@@ -148,12 +148,12 @@ async def refresh_token(refresh_token: str = Form(...), db: Session = Depends(da
     if user is None:
         raise HTTPException(status_code=401, detail="User not found")
         
-    new_access_token = auth.create_access_token(data={"sub": user.email})
+    new_access_token = security.create_access_token(data={"sub": user.email})
     return {"access_token": new_access_token, "token_type": "bearer"}
 
 @app.post("/logout")
 async def logout(token: str = Depends(dependencies.oauth2_scheme)):
-    auth.blacklist_token(token)
+    security.blacklist_token(token)
     return {"message": "Successfully logged out"}
 
 @app.get("/protected-data")
