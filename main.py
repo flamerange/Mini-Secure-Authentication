@@ -103,13 +103,15 @@ async def register(
 @limiter.limit("5/minute")
 async def login(
     request: Request,
-    form_data: OAuth2PasswordRequestForm = Depends(),
+    username: str = Form(None),
+    email: str = Form(...),
+    password: str = Form(...),
     db: Session = Depends(database.get_db)
 ):
 
     # Authenticate by email
-    user = db.query(models.User).filter(models.User.email == form_data.username).first()
-    if not user or not auth.verify_password(form_data.password, user.hashed_password):
+    user = db.query(models.User).filter(models.User.email == email).first()
+    if not user or not auth.verify_password(password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
