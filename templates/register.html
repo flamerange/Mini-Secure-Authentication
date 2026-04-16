@@ -13,7 +13,7 @@
     
     <div id="alert-box" class="hidden mb-8 p-4 rounded-xl text-sm border font-medium animate-in fade-in slide-in-from-top-4 duration-300"></div>
 
-    <form id="register-form" class="space-y-6">
+    <form id="register-form" action="/register" method="POST" class="space-y-6">
         <div class="space-y-1.5">
             <label for="username" class="block text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">Username</label>
             <input type="text" id="username" name="username" required placeholder="johndoe"
@@ -28,7 +28,7 @@
         
         <div class="space-y-1.5">
             <label for="password" class="block text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">Password</label>
-            <input type="password" id="password" name="password" required placeholder="••••••••"
+            <input type="password" id="password" name="password" required placeholder="Enter password"
                 class="input-field w-full rounded-xl px-5 py-3.5 text-white outline-none focus:ring-2 focus:ring-indigo-500/50">
         </div>
         

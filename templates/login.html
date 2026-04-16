@@ -13,7 +13,7 @@
     
     <div id="alert-box" class="hidden mb-8 p-4 rounded-xl text-sm border font-medium animate-in fade-in slide-in-from-top-4 duration-300"></div>
 
-    <form id="login-form" class="space-y-6">
+    <form id="login-form" action="/login" method="POST" class="space-y-6">
         <div class="space-y-1.5">
             <label for="email" class="block text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">Terminal Email</label>
             <input type="email" id="email" name="username" required placeholder="name@domain.com"
@@ -24,7 +24,7 @@
             <div class="flex justify-between items-center ml-1">
                 <label for="password" class="block text-xs font-bold uppercase tracking-widest text-slate-400">Access Key</label>
             </div>
-            <input type="password" id="password" name="password" required placeholder="••••••••"
+            <input type="password" id="password" name="password" required placeholder="Enter password"
                 class="input-field w-full rounded-xl px-5 py-3.5 text-white outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all">
         </div>
         
