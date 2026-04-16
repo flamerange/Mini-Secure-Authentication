@@ -29,8 +29,8 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # Security Middlewares
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=["*", "https://mini-secure-authentication.onrender.com"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
